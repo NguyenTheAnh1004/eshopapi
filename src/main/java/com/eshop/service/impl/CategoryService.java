@@ -11,6 +11,7 @@ import com.eshop.dto.CategoryDTO;
 import com.eshop.entity.CategoryEntity;
 import com.eshop.repository.CategoryRepository;
 import com.eshop.service.ICategoryService;
+import com.github.slugify.Slugify;
 
 @Service
 public class CategoryService implements ICategoryService {
@@ -19,6 +20,8 @@ public class CategoryService implements ICategoryService {
 
 	@Autowired
 	CategoryRepository categoryRepository;
+	
+	private Slugify slg = new Slugify();
 
 	public List<CategoryDTO> findAll() {
 		List<CategoryEntity> categoryEntity = new ArrayList<CategoryEntity>();
@@ -34,6 +37,7 @@ public class CategoryService implements ICategoryService {
 
 	@Override
 	public CategoryDTO save(CategoryDTO dto) {
+		dto.setCode(slg.slugify(dto.getName()));
 		CategoryEntity entity = new CategoryEntity();
 		entity = modelMapper.map(dto, CategoryEntity.class);
 		entity = categoryRepository.save(entity);
@@ -42,6 +46,7 @@ public class CategoryService implements ICategoryService {
 
 	@Override
 	public CategoryDTO update(CategoryDTO dto) {
+		dto.setCode(slg.slugify(dto.getName()));
 		CategoryEntity oldEntity = categoryRepository.findOneById(dto.getId());
 		dto.setCreatedBy(oldEntity.getCreatedBy());
 		dto.setCreatedDate(oldEntity.getCreatedDate());

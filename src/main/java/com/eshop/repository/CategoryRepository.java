@@ -20,4 +20,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>{
 
 	CategoryEntity findOneByName(String categoryName);
 
+	CategoryEntity findOneByCode(String catecode);
+
 }

@@ -79,6 +79,11 @@ public class ProductAPI {
 
 		return productService.Save(name, price, shortDes, shortDetails, file, quantity, discount, view, categoryName, size);
 	}
+	
+	@GetMapping(value = "/{cate}")
+	public List<ProductDTO> findProductByCategory(@PathVariable("cate") String cate) {
+		return productService.findByCategory(cate);
+	}
 
 	@GetMapping(value = "/Images/Product/{photo}")
 	public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {

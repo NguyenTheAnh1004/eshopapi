@@ -22,6 +22,8 @@ public interface IProductService {
 	ProductDTO findOneByName(String name);
 
 	ProductDTO findOneByCode(String code);
+	
+	List<ProductDTO> findByCategory(String cate);
 
 	ProductDTO Save(String name, BigDecimal price, String shortDes, String shortDetails,
 			MultipartFile file, Integer quantity, Integer discount, Integer view, String categoryName, List<String> size) throws IOException;

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.eshop.dto.ProductDTO;
+import com.eshop.entity.CategoryEntity;
 import com.eshop.entity.ProductEntity;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
@@ -26,5 +27,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
 	@Query("SELECT p FROM ProductEntity p WHERE p.name LIKE %:name%")
 	List<ProductEntity> findByNameLike(@Param("name") String name);
+
+	List<ProductEntity> findByCategory(CategoryEntity idcate);
 
 }

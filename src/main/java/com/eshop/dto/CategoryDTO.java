@@ -3,6 +3,8 @@ package com.eshop.dto;
 public class CategoryDTO extends AbstractDTO {
 	
 	private String name;
+	private String code;
+
 	private Integer sortOrder;
 	
 	public Integer getSortOrder() {
@@ -21,4 +23,12 @@ public class CategoryDTO extends AbstractDTO {
 		this.name = name;
 	}
 	
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 }

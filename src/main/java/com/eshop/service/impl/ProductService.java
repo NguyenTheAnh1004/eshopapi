@@ -259,4 +259,22 @@ public class ProductService implements IProductService {
 
 	}
 
+	@Override
+	public List<ProductDTO> findByCategory(String catecode) {
+		CategoryEntity category = categoryRepository.findOneByCode(catecode);
+		List<ProductEntity> entity = productRepository.findByCategory(category);
+		List<ProductDTO> results = new ArrayList<ProductDTO>();
+		for (ProductEntity items : entity) {
+			modelMapper.typeMap(ProductEntity.class, ProductDTO.class)
+					.addMappings(mapper -> mapper.skip(ProductDTO::setSizes));
+			ProductDTO dto = modelMapper.map(items, ProductDTO.class);
+			items.getSizes().forEach(item -> {
+				dto.getSizes().add(item.getName());
+			});
+			urlImage(dto);
+			results.add(dto);
+		}
+		return results;    
+	}
+
 }

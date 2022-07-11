@@ -18,6 +18,9 @@ public class CategoryEntity extends BaseEntity {
 	
 	@Column(name = "sort_order")
 	private Integer sortOrder;
+	
+	@Column(name = "code", unique = true)
+	private String code;
 
 	@OneToMany(mappedBy = "category")
 	private List<ProductEntity> products = new ArrayList<ProductEntity>();
@@ -47,6 +50,12 @@ public class CategoryEntity extends BaseEntity {
 		this.products = products;
 	}
 	
-	
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 }
