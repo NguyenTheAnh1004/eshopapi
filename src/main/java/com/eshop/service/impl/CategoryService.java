@@ -15,8 +15,9 @@ import com.github.slugify.Slugify;
 
 @Service
 public class CategoryService implements ICategoryService {
-
-	private ModelMapper modelMapper = new ModelMapper();
+	
+	@Autowired
+	ModelMapper modelMapper;
 
 	@Autowired
 	CategoryRepository categoryRepository;

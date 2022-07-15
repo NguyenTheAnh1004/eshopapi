@@ -8,11 +8,14 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
+import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.cloudinary.utils.ObjectUtils;
+import com.eshop.conf.CloudinaryConfig;
 import com.eshop.converter.ProductConverter;
 import com.eshop.dto.ProductDTO;
 import com.eshop.dto.UserDTO;
@@ -37,7 +42,11 @@ import com.github.slugify.Slugify;
 @Service
 public class ProductService implements IProductService {
 
-	private ModelMapper modelMapper = new ModelMapper();
+	@Value("${cloud.url}")
+	private String cloudinaryURL;
+
+	@Autowired
+	ModelMapper modelMapper;
 
 	private Slugify slg = new Slugify();
 
@@ -52,6 +61,9 @@ public class ProductService implements IProductService {
 
 	@Autowired
 	private ProductConverter converter;
+
+	@Autowired
+	private CloudinaryConfig cloundinary;
 
 	private Random rand = new Random();
 
@@ -79,19 +91,27 @@ public class ProductService implements IProductService {
 
 	@Override
 	public String delete(long id) throws IOException {
-		ProductEntity entity = productRepository.findOneById(id);
-
+		// delete image in soure
+//		ProductEntity productEntity = productRepository.findOneById(id);
+//		try {
+//			Files.delete(this.root.resolve(productEntity.getImage()));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		// delete image
-		try {
-			Files.delete(this.root.resolve(entity.getImage()));
-		} catch (IOException e) {
-			e.printStackTrace();
+
+		Optional<ProductEntity> users = productRepository.findById(id);
+		if (users.isPresent()) {
+			ProductEntity entity = productRepository.findOneById(id);
+			// delete image on clound
+			cloundinary.delete("heroyolo/" + FilenameUtils.removeExtension(entity.getImage().replaceAll(" ", "%20")),
+					ObjectUtils.asMap("invalidate", true));
+			// end delete imgae on cloud
+			entity.getSizes().clear();
+			productRepository.deleteById(id);
+			return "deleted Product " + id + " successfully";
 		}
-		// delete image
-
-		String results = "remove " + entity.getName();
-		productRepository.deleteById(id);
-		return results;
+		return "delete fail";
 	}
 
 	@Override
@@ -143,10 +163,16 @@ public class ProductService implements IProductService {
 			throws IOException {
 
 		String code = slg.slugify(name);
+		// upload image in resoure
+//		Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()),
+//				StandardCopyOption.REPLACE_EXISTING);
+//		System.out.print(FilenameUtils.removeExtension(file.getOriginalFilename()));
 
-		// upload image
-		Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()),
-				StandardCopyOption.REPLACE_EXISTING);
+		// upload on cloundinary
+		cloundinary.upload(file.getBytes(),
+				ObjectUtils.asMap("public_id", FilenameUtils.removeExtension(file.getOriginalFilename()),
+						"unique_filename", "false", "folder", "heroyolo/"));
+
 		// end upload
 
 		ProductDTO product = new ProductDTO(name, price, shortDes, shortDetails, file.getOriginalFilename(), quantity,
@@ -201,12 +227,18 @@ public class ProductService implements IProductService {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-		if (file.getOriginalFilename() != "") {
-			Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()),
-					StandardCopyOption.REPLACE_EXISTING);
-		} else {
-			product.setImage(oldProduct.getImage());
-		}
+//		if (file.getOriginalFilename() != "") {
+//			Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()),
+//					StandardCopyOption.REPLACE_EXISTING);
+//		} else {
+//			product.setImage(oldProduct.getImage());
+//		}
+		cloundinary.delete("heroyolo/" + FilenameUtils.removeExtension(oldProduct.getImage().replaceAll(" ", "%20")),
+				ObjectUtils.asMap("invalidate", true));
+
+		cloundinary.upload(file.getBytes(),
+				ObjectUtils.asMap("public_id", FilenameUtils.removeExtension(file.getOriginalFilename()),
+						"unique_filename", "false", "folder", "heroyolo/"));
 
 		// end update image
 		modelMapper.getConfiguration().setSkipNullEnabled(true);
@@ -237,9 +269,15 @@ public class ProductService implements IProductService {
 	}
 
 	public void urlImage(ProductDTO dto) {
-		String fileDownloadUri = (ServletUriComponentsBuilder.fromCurrentContextPath().path("/Images/Product/")
-				.path(dto.getImage()).toUriString());
-		dto.setImage(fileDownloadUri);
+		// link resource
+//		String fileDownloadUri = (ServletUriComponentsBuilder.fromCurrentContextPath().path("/Images/Product/")
+//				.path(dto.getImage()).toUriString());
+//		dto.setImage(fileDownloadUri);
+
+		String fileDownloadUri = cloudinaryURL + dto.getImage();
+		String linkCloundinary = fileDownloadUri.replaceAll(" ", "%20");
+		dto.setImage(linkCloundinary);
+
 	}
 
 	@Override
@@ -274,7 +312,7 @@ public class ProductService implements IProductService {
 			urlImage(dto);
 			results.add(dto);
 		}
-		return results;    
+		return results;
 	}
 
 }

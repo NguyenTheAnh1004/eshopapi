@@ -85,6 +85,8 @@ public class ProductAPI {
 		return productService.findByCategory(cate);
 	}
 
+	
+	//get image in resource
 	@GetMapping(value = "/Images/Product/{photo}")
 	public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
 		if (!photo.equals("") || photo != null) {

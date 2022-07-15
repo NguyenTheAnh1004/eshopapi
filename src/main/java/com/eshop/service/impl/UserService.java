@@ -29,7 +29,8 @@ public class UserService implements IUserService {
 	@Autowired
 	private RoleRepository roleRepository;
 	
-	private ModelMapper modelMapper = new ModelMapper();
+	@Autowired
+	ModelMapper modelMapper;
 	
 	@Override
 	public List<UserDTO> findAll() {
