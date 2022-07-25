@@ -14,7 +14,7 @@ import com.eshop.entity.CategoryEntity;
 public class ProductDTO extends AbstractDTO {
 
 	private String name;
-	private BigDecimal price;
+	private BigDecimal price;  
 	private String shortDes;
 	private String shortDetails;
 	private String image;

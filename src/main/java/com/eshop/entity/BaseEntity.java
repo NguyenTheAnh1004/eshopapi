@@ -40,7 +40,7 @@ public class BaseEntity {
 	private String updatedBy;
 	
 	@Column(name = "status")
-	private Boolean status;
+	private Boolean status = true;
 	
 	public Long getId() {
 		return id;

@@ -36,7 +36,7 @@ public class ProductAPI {
 
 	@GetMapping(value = "/Product")
 	public List<ProductDTO> showProduct() {
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+//		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
 //		System.out.print(fileDownloadUri);
 		return productService.findAll();
 	}

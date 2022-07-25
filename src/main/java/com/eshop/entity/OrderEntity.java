@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -13,13 +14,16 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "orders")
-public class OrderEntiry extends BaseEntity{
+public class OrderEntity extends BaseEntity{
 	
 	@Column(name = "code")
 	private String code;
 
 	@Column(name = "total", precision = 13, scale = 2, nullable = false)
 	private BigDecimal total;
+	
+	@Column(name = "customer_id")
+	private Long customerId;
 
 	@Column(name = "customer_phone")
 	private String customerPhone;
@@ -43,39 +47,7 @@ public class OrderEntiry extends BaseEntity{
 	@Column(name = "message")
 	private String message;  
 	
-	public String getPayment() {
-		return payment;
-	}
-
-	public void setPayment(String payment) {
-		this.payment = payment;
-	}
-
-	public String getPaymentInfo() {
-		return paymentInfo;
-	}
-
-	public void setPaymentInfo(String paymentInfo) {
-		this.paymentInfo = paymentInfo;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public List<ProductOrderEntity> getProductorder() {
-		return productorder;
-	}
-
-	public void setProductorder(List<ProductOrderEntity> productorder) {
-		this.productorder = productorder;
-	}
-
-	@OneToMany(mappedBy="order")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy="order",orphanRemoval = true)
     private List<ProductOrderEntity> productorder = new ArrayList<ProductOrderEntity>();
 
 	public String getCode() {
@@ -92,6 +64,14 @@ public class OrderEntiry extends BaseEntity{
 
 	public void setTotal(BigDecimal total) {
 		this.total = total;
+	}
+
+	public Long getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(Long customerId) {
+		this.customerId = customerId;
 	}
 
 	public String getCustomerPhone() {
@@ -126,12 +106,39 @@ public class OrderEntiry extends BaseEntity{
 		this.customerEmail = customerEmail;
 	}
 
-	public List<ProductOrderEntity> getProductOrder() {
+	public String getPayment() {
+		return payment;
+	}
+
+	public void setPayment(String payment) {
+		this.payment = payment;
+	}
+
+	public String getPaymentInfo() {
+		return paymentInfo;
+	}
+
+	public void setPaymentInfo(String paymentInfo) {
+		this.paymentInfo = paymentInfo;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public List<ProductOrderEntity> getProductorder() {
 		return productorder;
 	}
 
-	public void setProductOrder(List<ProductOrderEntity> productorder) {
-		this.productorder= productorder;
+	public void setProductorder(List<ProductOrderEntity> productorder) {
+		this.productorder = productorder;
 	}
+	
+
+	
 	
 }
