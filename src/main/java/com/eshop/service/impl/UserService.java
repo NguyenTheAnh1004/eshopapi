@@ -39,6 +39,7 @@ public class UserService implements IUserService {
 		List<UserDTO> results = new ArrayList<UserDTO>();
 		for(UserEntity items: entity) {
 			modelMapper.typeMap(UserEntity.class, UserDTO.class).addMappings(mapper -> mapper.skip(UserDTO::setRoles));
+			modelMapper.typeMap(UserEntity.class, UserDTO.class).addMappings(mapper -> mapper.skip(UserDTO::setPassword));
 			UserDTO dto = modelMapper.map(items, UserDTO.class);
 			items.getRoles().forEach(item -> {
 				dto.getRoles().add(item.getName());  
@@ -73,6 +74,7 @@ public class UserService implements IUserService {
 	public UserDTO update(UserDTO dto) {
 		UserEntity entity = userRepository.findOneById(dto.getId());
 		modelMapper.typeMap(UserDTO.class, UserEntity.class).addMappings(mapper -> mapper.skip(UserEntity::setRoles));
+//		modelMapper.getConfiguration().setSkipNullEnabled(true);
 		dto.setCreatedBy(entity.getCreatedBy());
 		dto.setCreatedDate(entity.getCreatedDate());
 		entity = modelMapper.map(dto, UserEntity.class); 
@@ -84,6 +86,7 @@ public class UserService implements IUserService {
 		entity.setPassword(encoder.encode(entity.getPassword()));
 		entity = userRepository.save(entity);
 		modelMapper.typeMap(UserEntity.class, UserDTO.class).addMappings(mapper -> mapper.skip(UserDTO::setRoles));
+		modelMapper.typeMap(UserEntity.class, UserDTO.class).addMappings(mapper -> mapper.skip(UserDTO::setPassword));
 		UserDTO result = new UserDTO();
 		UserDTO results = modelMapper.map(entity, UserDTO.class);
 		entity.getRoles().forEach(items -> {
@@ -109,6 +112,7 @@ public class UserService implements IUserService {
 		UserEntity entity = new UserEntity();
 		entity = userRepository.findOneByUsername(Name);
 		modelMapper.typeMap(UserEntity.class, UserDTO.class).addMappings(mapper -> mapper.skip(UserDTO::setRoles));
+		modelMapper.typeMap(UserEntity.class, UserDTO.class).addMappings(mapper -> mapper.skip(UserDTO::setPassword));
 		UserDTO dto = modelMapper.map(entity, UserDTO.class);
 		entity.getRoles().forEach(item -> {
 			dto.getRoles().add(item.getName());  

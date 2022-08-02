@@ -1,4 +1,4 @@
-package com.eshop.entity;
+   package com.eshop.entity;
 
 import java.util.ArrayList;
 import java.util.List;

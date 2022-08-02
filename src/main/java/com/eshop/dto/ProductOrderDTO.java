@@ -12,7 +12,7 @@ public class ProductOrderDTO extends AbstractDTO {
 	private Long orderId;
 	private Long productId;
 	private String image;
-
+	private String name;
 	public ProductOrderDTO() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -56,4 +56,13 @@ public class ProductOrderDTO extends AbstractDTO {
 	public void setImage(String image) {
 		this.image = image;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 }

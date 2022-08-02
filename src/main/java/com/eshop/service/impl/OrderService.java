@@ -47,8 +47,9 @@ public class OrderService implements IOrderService {
 
 	@Override
 	public OrderDTO payment(OrderDTO orderDTO) {
-		int int_random = rand.nextInt(10000); 
-		orderDTO.setCode(String.valueOf(int_random));
+//		int int_random = rand.nextInt(10000); 
+//		orderDTO.setCode(String.valueOf(int_random));
+		orderDTO.setPaymentInfo(orderDTO.getPaymentInfo()+" ,code: "+orderDTO.getCode());
 		OrderEntity orderEntity = new OrderEntity();
 		modelMapper.typeMap(OrderDTO.class, OrderEntity.class)
 				.addMappings(mapper -> mapper.skip(OrderEntity::setProductorder));
@@ -112,15 +113,19 @@ public class OrderService implements IOrderService {
 		List<OrderDTO> listOrderDTO = new ArrayList<OrderDTO>();
 		for(OrderEntity entity : listOrderEntity) {
 			OrderDTO dto = new OrderDTO();
+//			ProductEntity entity = productRepository.findOneById
 			dto = modelMapper.map(entity , OrderDTO.class);
 			int index = 0;
 			List<String> listImage = new ArrayList<String>();
+			List<String> listName = new ArrayList<String>();
 			for(ProductOrderEntity pOEntity : entity.getProductorder()) {
 				listImage.add(pOEntity.getProduct().getImage());
+				listName.add(pOEntity.getProduct().getName());
 			}
 			int indexImage = 0;
-			for(ProductOrderDTO image : dto.getProductorder()) {
-				image.setImage((cloudinaryURL + listImage.get(indexImage)).replaceAll(" ", "%20"));
+			for(ProductOrderDTO PDto : dto.getProductorder()) {
+				PDto.setImage((cloudinaryURL + listImage.get(indexImage)).replaceAll(" ", "%20"));
+				PDto.setName(listName.get(indexImage));
 				indexImage++;
 			}
 			listOrderDTO.add(dto);
