@@ -47,6 +47,7 @@ public class OrderService implements IOrderService {
 
 	@Override
 	public OrderDTO payment(OrderDTO orderDTO) {
+		orderDTO.setStatus(false);
 //		int int_random = rand.nextInt(10000); 
 //		orderDTO.setCode(String.valueOf(int_random));
 		orderDTO.setPaymentInfo(orderDTO.getPaymentInfo()+" ,code: "+orderDTO.getCode());
@@ -78,17 +79,20 @@ public class OrderService implements IOrderService {
 		orderEntity = orderRepository.save(orderEntity);
 		OrderDTO newOrderDTO = new OrderDTO();
 		List<String> listImage = new ArrayList<String>();
+		List<String> listName = new ArrayList<String>();
 		for (ProductOrderEntity items : productOrders) {
 			items.setOrder(orderEntity);
 			productOrderRepository.save(items);
 			orderEntity.getProductorder().add(items);
 			listImage.add(items.getProduct().getImage());
+			listName.add(items.getProduct().getName());
 		}
 		newOrderDTO = modelMapper.map(orderEntity, OrderDTO.class);
 //		urlImage(newOrderDTO);
 		int indexImage = 0;
 		for(ProductOrderDTO image : newOrderDTO.getProductorder()) {
 			image.setImage((cloudinaryURL + listImage.get(indexImage)).replaceAll(" ", "%20"));
+			image.setImage(listImage.get(indexImage));
 			indexImage++;
 		}
 		return newOrderDTO;
@@ -139,12 +143,15 @@ public class OrderService implements IOrderService {
 		entity = orderRepository.findOneById(id);
 		OrderDTO dto = modelMapper.map(entity, OrderDTO.class);
 		List<String> listImage = new ArrayList<String>();
+		List<String> listName = new ArrayList<String>();
 		for(ProductOrderEntity pOEntity : entity.getProductorder()) {
 			listImage.add(pOEntity.getProduct().getImage());
+			listName.add(pOEntity.getProduct().getName());
 		}
 		int indexImage = 0;
 		for(ProductOrderDTO image : dto.getProductorder()) {
 			image.setImage((cloudinaryURL + listImage.get(indexImage)).replaceAll(" ", "%20"));
+			image.setName(listName.get(indexImage));
 			indexImage++;
 		}
 		return dto;
@@ -159,16 +166,39 @@ public class OrderService implements IOrderService {
 	@Override
 	public OrderDTO changeStatus(Long id) {
 		OrderEntity entity = orderRepository.findOneById(id);
+		
+		// change quantity
+		if(!entity.isStatus()) {
+			for(ProductOrderEntity productOrder : entity.getProductorder()) {
+				ProductEntity product = productRepository.findOneById(productOrder.getProduct().getId());
+				product.setQuantity(product.getQuantity() - productOrder.getQuantity());
+				productRepository.save(product);
+			}
+		} else {
+			for(ProductOrderEntity productOrder : entity.getProductorder()) {
+				ProductEntity product = productRepository.findOneById(productOrder.getProduct().getId());
+				product.setQuantity(product.getQuantity() + productOrder.getQuantity());
+				productRepository.save(product);
+			}
+		}
+		//
+		
+		// change status
 		entity.setStatus(!entity.isStatus());
+		//
+		
 		entity = orderRepository.save(entity);
 		OrderDTO dto = modelMapper.map(entity, OrderDTO.class);
 		List<String> listImage = new ArrayList<String>();
+		List<String> listName = new ArrayList<String>();
 		for(ProductOrderEntity pOEntity : entity.getProductorder()) {
 			listImage.add(pOEntity.getProduct().getImage());
+			listName.add(pOEntity.getProduct().getName());
 		}
 		int indexImage = 0;
 		for(ProductOrderDTO image : dto.getProductorder()) {
 			image.setImage((cloudinaryURL + listImage.get(indexImage)).replaceAll(" ", "%20"));
+			image.setName(listName.get(indexImage));
 			indexImage++;
 		}
 		return dto;
